@@ -1,7 +1,9 @@
 import sys
-import datetime
-import simplejson as json
 from pathlib import Path
+import datetime
+import pytz
+import simplejson as json
+
 import morphological_analysis
 import preparation
 import question_generator
@@ -21,8 +23,7 @@ def time_setting(f_path):
 
 def preparate_file_paths():
     # ファイルパスの準備
-    self_path = Path("__file__").parent.resolve().parent
-    fn = self_path / "file_paths.json"
+    fn = "file_paths.json"
     if not fn.is_file():
         print("[file error]", fn.name, "is not found.")
         sys.exit()
@@ -33,12 +34,9 @@ def preparate_file_paths():
 
     for fgroup in jsonData:
         data_root = fgroup.pop("DATA_ROOT")
+        root_path = Path(data_root)
         for fn, fp in fgroup.items():
-            if data_root == "":
-                # 自分のファイルから伸びるパス
-                f_paths[fn] = self_path / fp
-            else:
-                f_paths[fn] = Path(data_root + "/" + fp)
+            f_paths[fn] = root_path / fp
     return f_paths
 
 
@@ -63,9 +61,6 @@ def main(DEBUG):
         now_time = datetime.datetime.now()
     print("now_time", now_time)
     f_paths = preparate_file_paths()
-
-    # プログラムを実行する間隔
-    t = time_setting(f_path=f_paths["SETTING"])
 
     # 形態素解析部
     # 過去5分以内に新しい投稿があるかどうか判定し、新しい投稿を形態素した結果を保存
