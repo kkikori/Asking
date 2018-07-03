@@ -92,6 +92,7 @@ def _previous_qs(THREADS, POSTS, USERS, f_individual, f_collective):
 
 
 def preparate_main(fn_paths):
+    print("c")
     POSTS = {}
     THREADS = {}
     USERS = {}
