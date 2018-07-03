@@ -236,12 +236,17 @@ def _extract_cand_pair(phs):
 # 形容動詞で形の変形が必要な場合は変形する
 def _deform_a1(n1, a1, f_template):
     n1a1_templates = _read_templates(fn=f_template)
+    rc = random.choice(n1a1_templates["cushions"])
+    tmp = n1a1_templates["templates"]
 
     list_demand_adjust = [0, 1]
-    r = random.randint(0, len(n1a1_template) - 1)
-    if (r in list_demand_adjust) and (a1[-1] == "だ"):
-        return n1a1_template[r].replace("<n>", n1).replace("<a>", a1[:-1] + "な")
-    return n1a1_template[r].replace("<n>", n1).replace("<a>", a1)
+    ri = random.randint(0, len(tmp) - 1)
+    if (ri in n1a1_templates["need_demand"]) and (a1[-1] == "だ"):
+        rmsg = tmp[ri].replace("<n>", n1).replace("<a>", a1[:-1] + "な")
+    else:
+        rmsg = tmp[ri].replace("<n>", n1).replace("<a>", a1)
+
+    return rc + rmsg
 
 
 def no_premise_q_generator(f_template, target="", phs="", TFIDF_pp="", ):
