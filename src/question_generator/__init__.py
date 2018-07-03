@@ -1,4 +1,4 @@
-from .q1_generator import q1_generator
-from .q2_generator import q2_generator
-from .q3_generator import q3_generator
 from .main_generator import q_generator_main
+from .q_no_premise import no_premise_q_generator
+from .q_has_nod import has_nod_q_generator
+from .q_same_category import same_category_q_generator

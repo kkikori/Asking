@@ -63,7 +63,9 @@ def _to_individual_q(user, target_pi, post, now_time, f_paths, TFIDF_pp, thresho
             continue
         else:
             phs = mynlp.read_mrph_per_sentence(f_path=f_paths["MRPH_ANALYSIS"], pi=target_pi, si=si)
-            q1 = question_generator.q1_generator(target={"pi": target_pi, "si": si}, phs=phs, TFIDF_pp=TFIDF_pp)
+            q1 = question_generator.no_premise_q_generator(target={"pi": target_pi, "si": si}, phs=phs, \
+                                                           TFIDF_pp=TFIDF_pp, \
+                                                           f_template=f_paths["NO_PREMISE_Q_TEMPLATES"])
 
         if q1:
             _save_and_call_q(pi=target_pi, si=si, q_body=q1, fn_postapi=f_paths["POST_API"],

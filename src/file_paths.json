@@ -12,7 +12,7 @@
     "PAST_POST_LIST":"past_post_list.txt"
   },
   {
-    "DATA_ROOT":".../question_templates",
+    "DATA_ROOT":"/Users/ida/Dropbox/kalliopeia_q_templates",
     "NO_PREMISE_Q_TEMPLATES":"no_premise_q_template.json",
     "HAS_NOD_Q_TEMPLATES":"has_nod_q_templates.json",
     "SAME_CATEGORY_Q_TEMPLATES":"same_category_q_templates.json"

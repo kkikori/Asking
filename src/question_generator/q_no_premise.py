@@ -1,8 +1,19 @@
-import mynlp, re, random
+import mynlp
+import re
+import random
+import sys
+import json
 
-n1a1_template = ["<n>の<a>ところはどのような点ですか？", \
-                 "<n>の<a>ところは他にもありますか？", \
-                 "<n>が<a>と思う根拠はありますか？"]
+
+def _read_templates(fn):
+    if not fn.is_file():
+        print("[file error]", fn, "is not found.")
+        sys.exit()
+    f = fn.open("r")
+    jsonData = json.load(f)
+    f.close()
+
+    return jsonData
 
 
 # 文節をまたいだ合成後にも対応
@@ -119,7 +130,7 @@ def _choice_pair(cand_pairs, TFIDF_pp, target):
             try:
                 score_list.append(target_tfidf_score[w])
             except:
-                #print("  error in _choice_pair(", w, ")")
+                # print("  error in _choice_pair(", w, ")")
                 print("")
 
         try:
@@ -223,7 +234,9 @@ def _extract_cand_pair(phs):
 
 
 # 形容動詞で形の変形が必要な場合は変形する
-def _deform_a1(n1, a1):
+def _deform_a1(n1, a1, f_template):
+    n1a1_templates = _read_templates(fn=f_template)
+
     list_demand_adjust = [0, 1]
     r = random.randint(0, len(n1a1_template) - 1)
     if (r in list_demand_adjust) and (a1[-1] == "だ"):
@@ -231,7 +244,7 @@ def _deform_a1(n1, a1):
     return n1a1_template[r].replace("<n>", n1).replace("<a>", a1)
 
 
-def q1_generator(target="", phs="", TFIDF_pp=""):
+def no_premise_q_generator(f_template, target="", phs="", TFIDF_pp="", ):
     cross_phs = mynlp.cross_ph_compounder(o_phs=phs)
 
     cand_pairs = _extract_cand_pair(phs=cross_phs)

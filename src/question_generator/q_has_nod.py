@@ -5,7 +5,7 @@ only_nod_template_with_premise = ["以下の意見に賛成意見が出ていま
 
 
 
-def q2_generator(post, si, thread_title):
+def has_nod_q_generator(post, si, thread_title):
     select_template = random.choice(only_nod_template_with_premise)
 
     claim_s = post.sentences[si].body

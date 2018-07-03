@@ -94,7 +94,7 @@ def _extract_category_domain(phs):
 
 # 親投稿文と投稿文が同じカテゴリに属する単語を持っている場合はテンプレ文を返す
 # p_ph = 親投稿の形態素情報
-def q3_generator(TFIDF_pp="", parent="", child="", th_title="", f_mrph=""):
+def same_category_q_generator(TFIDF_pp="", parent="", child="", th_title="", f_mrph=""):
     p_phs = mynlp.read_mrph_per_post(f_path=f_mrph, pi=parent["pi"])
     c_phs = mynlp.read_mrph_per_post(f_path=f_mrph, pi=child["pi"])
 
