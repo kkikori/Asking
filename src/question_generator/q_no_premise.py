@@ -258,4 +258,4 @@ def no_premise_q_generator(f_template, target="", phs="", TFIDF_pp="", ):
         return None
     n1, a1 = _choice_pair(cand_pairs=cand_pairs, TFIDF_pp=TFIDF_pp, target=target)
 
-    return _deform_a1(n1, a1)
+    return _deform_a1(n1, a1, f_template)
