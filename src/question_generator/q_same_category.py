@@ -82,7 +82,6 @@ def _extract_embed_word(phs="", category_words=""):
 # テンプレ文を生成
 def _same_category(p_category, c_category, p_ph, c_ph, th_title, f_tmp):
     templates = _read_templates(fn=f_tmp)
-    select_templates = random.choice(templates["templates"])
 
     p_words = _extract_embed_word(phs=p_ph, category_words=p_category)
     c_words = _extract_embed_word(phs=c_ph, category_words=c_category)
@@ -90,7 +89,7 @@ def _same_category(p_category, c_category, p_ph, c_ph, th_title, f_tmp):
     category_words = list(set(p_words + c_words))
     c = "、".join(random.sample(category_words, 3))
 
-    rmsg = select_templates.replace("<c>", c).replace("<title>", th_title)
+    rmsg = random.choice(templates["templates"]).replace("<c>", c).replace("<title>", th_title)
 
     return random.choice(templates["cushions"]) + rmsg
 
