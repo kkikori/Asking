@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 import datetime
-import pytz
 import simplejson as json
 
 import morphological_analysis
