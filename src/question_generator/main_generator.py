@@ -2,8 +2,7 @@ import datetime, csv, json, re
 import question_generator, mynlp
 
 r_only_nod = r"同意|賛成|同感|good|great|nice|agree"
-
-Agreement = 6
+r_question = r"?$|？$|でしょうか"
 
 
 def _setting_q_threshold(fn):
@@ -27,7 +26,7 @@ def _save_and_call_q(pi, si, q_body, fn_postapi, f_save):
     f.close()
 
     # api attack
-    save_q = {"body": q_body, "in_reply_to_id": pi, "agreement": Agreement}
+    save_q = {"body": q_body, "in_reply_to_id": pi}
 
     fn = str(pi) + ".json"
     f = (fn_postapi / fn).open("w")
@@ -63,6 +62,9 @@ def _to_individual_q(user, target_pi, post, now_time, f_paths, TFIDF_pp, thresho
     for si, s in enumerate(post.sentences):
         if s.tag != "CLAIM" or len(s.has_premise) > 1:
             continue
+        elif re.search(r_question, s.body):
+            # 質問文は除く措置
+            continue
         else:
             phs = mynlp.read_mrph_per_sentence(f_path=f_paths["MRPH_ANALYSIS"], pi=target_pi, si=si)
             q1 = question_generator.no_premise_q_generator(target={"pi": target_pi, "si": si}, phs=phs, \
@@ -74,7 +76,7 @@ def _to_individual_q(user, target_pi, post, now_time, f_paths, TFIDF_pp, thresho
                              f_save=f_paths["INDIVIDUAL_Q"])
             return True
 
-        # q2 = question_generator.over_thread_q_generator(THREAD=)
+            # q2 = question_generator.over_thread_q_generator(THREAD=)
 
     return False
 
@@ -91,7 +93,7 @@ def _to_collective_q(thread, target_pi, post, now_time, f_paths, TFIDF_pp, thres
         if len(s.body) < 10 and re.search(r_only_nod, s.body):
             print("try q2 generate", target_pi, si, thread.title)
             q3 = question_generator.has_nod_q_generator(post=POSTS[s.pointer_post_id], si=s.pointer_sentence_id, \
-                                                 thread_title=thread.title, f_tmp=f_paths["HAS_NOD_Q_TEMPLATES"])
+                                                        thread_title=thread.title, f_tmp=f_paths["HAS_NOD_Q_TEMPLATES"])
             if q3:
                 _save_and_call_q(pi=target_pi, si=si, q_body=q3, fn_postapi=f_paths["POST_API"], \
                                  f_save=f_paths["COLLECTIVE_Q"])
@@ -101,8 +103,8 @@ def _to_collective_q(thread, target_pi, post, now_time, f_paths, TFIDF_pp, thres
         pointer_id = {"pi": s.pointer_post_id, "si": s.pointer_sentence_id}
         print("try q3 generate ", target_pi, si)
         q4 = question_generator.same_category_q_generator(TFIDF_pp=TFIDF_pp, parent=pointer_id, child=target_id, \
-                                             th_title=thread.title, f_mrph=f_paths["MRPH_ANALYSIS"], \
-                                             f_tmp=f_paths["SAME_CATEGORY_Q_TEMPLATES"])
+                                                          th_title=thread.title, f_mrph=f_paths["MRPH_ANALYSIS"], \
+                                                          f_tmp=f_paths["SAME_CATEGORY_Q_TEMPLATES"])
         if q4:
             _save_and_call_q(pi=target_pi, si=si, q_body=q4, fn_postapi=f_paths["POST_API"], \
                              f_save=f_paths["COLLECTIVE_Q"])
