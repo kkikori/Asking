@@ -55,6 +55,8 @@ def _judge_user_term(post, usr, now_time, thresholds):
 
 
 def _to_individual_q(user, target_pi, post, now_time, f_paths, TFIDF_pp, thresholds):
+    # no_premise_qがダメだった場合のみ、q2が起動
+    # どちらか問いかけが生成された場合はTrue、失敗した場合はFalseを返す
     judge = _judge_user_term(post=post, usr=user, now_time=now_time, thresholds=thresholds)
     if not judge:
         return False
@@ -72,6 +74,8 @@ def _to_individual_q(user, target_pi, post, now_time, f_paths, TFIDF_pp, thresho
                              f_save=f_paths["INDIVIDUAL_Q"])
             return True
 
+        # q2 = question_generator.over_thread_q_generator(THREAD=)
+
     return False
 
 
@@ -86,21 +90,21 @@ def _to_collective_q(thread, target_pi, post, now_time, f_paths, TFIDF_pp, thres
         # q2をやる
         if len(s.body) < 10 and re.search(r_only_nod, s.body):
             print("try q2 generate", target_pi, si, thread.title)
-            q2 = question_generator.q2_generator(post=POSTS[s.pointer_post_id], si=s.pointer_sentence_id, \
+            q3 = question_generator.has_nod_q_generator(post=POSTS[s.pointer_post_id], si=s.pointer_sentence_id, \
                                                  thread_title=thread.title, f_tmp=f_paths["HAS_NOD_Q_TEMPLATES"])
-            if q2:
-                _save_and_call_q(pi=target_pi, si=si, q_body=q2, fn_postapi=f_paths["POST_API"], \
+            if q3:
+                _save_and_call_q(pi=target_pi, si=si, q_body=q3, fn_postapi=f_paths["POST_API"], \
                                  f_save=f_paths["COLLECTIVE_Q"])
                 return True
 
         target_id = {"pi": target_pi, "si": si}
         pointer_id = {"pi": s.pointer_post_id, "si": s.pointer_sentence_id}
         print("try q3 generate ", target_pi, si)
-        q3 = question_generator.q3_generator(TFIDF_pp=TFIDF_pp, parent=pointer_id, child=target_id, \
+        q4 = question_generator.same_category_q_generator(TFIDF_pp=TFIDF_pp, parent=pointer_id, child=target_id, \
                                              th_title=thread.title, f_mrph=f_paths["MRPH_ANALYSIS"], \
                                              f_tmp=f_paths["SAME_CATEGORY_Q_TEMPLATES"])
-        if q3:
-            _save_and_call_q(pi=target_pi, si=si, q_body=q3, fn_postapi=f_paths["POST_API"], \
+        if q4:
+            _save_and_call_q(pi=target_pi, si=si, q_body=q4, fn_postapi=f_paths["POST_API"], \
                              f_save=f_paths["COLLECTIVE_Q"])
             return True
     return False
