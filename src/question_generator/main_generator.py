@@ -87,7 +87,7 @@ def _to_collective_q(thread, target_pi, post, now_time, f_paths, TFIDF_pp, thres
         if len(s.body) < 10 and re.search(r_only_nod, s.body):
             print("try q2 generate", target_pi, si, thread.title)
             q2 = question_generator.q2_generator(post=POSTS[s.pointer_post_id], si=s.pointer_sentence_id, \
-                                                 thread_title=thread.title)
+                                                 thread_title=thread.title, f_tmp=f_paths["HAS_NOD_Q_TEMPLATES"])
             if q2:
                 _save_and_call_q(pi=target_pi, si=si, q_body=q2, fn_postapi=f_paths["POST_API"], \
                                  f_save=f_paths["COLLECTIVE_Q"])
@@ -97,7 +97,8 @@ def _to_collective_q(thread, target_pi, post, now_time, f_paths, TFIDF_pp, thres
         pointer_id = {"pi": s.pointer_post_id, "si": s.pointer_sentence_id}
         print("try q3 generate ", target_pi, si)
         q3 = question_generator.q3_generator(TFIDF_pp=TFIDF_pp, parent=pointer_id, child=target_id, \
-                                             th_title=thread.title, f_mrph=f_paths["MRPH_ANALYSIS"])
+                                             th_title=thread.title, f_mrph=f_paths["MRPH_ANALYSIS"], \
+                                             f_tmp=f_paths["SAME_CATEGORY_Q_TEMPLATES"])
         if q3:
             _save_and_call_q(pi=target_pi, si=si, q_body=q3, fn_postapi=f_paths["POST_API"], \
                              f_save=f_paths["COLLECTIVE_Q"])
@@ -139,6 +140,7 @@ def q_generator_main(POSTS, THREAD, USERS, f_paths, TFIDF_pp, now_time):
     # 一回でもq1をやったら終わる
     # if individual:
     #     return
+
 
     """
     to_collective_q

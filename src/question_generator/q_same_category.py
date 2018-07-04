@@ -1,12 +1,23 @@
 import random
 import numpy as np
 from collections import defaultdict
+import sys
+import json
+
 import mynlp
 
-# テンプレート
-same_category_template = ["「[<title>]<c>」についていくつかコメントが挙げられています。他にコメントはありませんか？", \
-                          "「[<title>]<c>」についていくつかコメントが挙げられています。他に情報はありませんか？"]
-same_word_template = ["<n>について「<p>、<c>」などがコメントされています。他の方はいませんか？"]
+
+def _read_templates(fn):
+    if not fn.is_file():
+        print("[file error]", fn, "is not found.")
+        sys.exit()
+    f = fn.open("r")
+    jsonData = json.load(f)
+    f.close()
+
+    return jsonData
+
+
 r_only_nod = r"同意|賛成|同感|共感"
 
 
@@ -69,14 +80,19 @@ def _extract_embed_word(phs="", category_words=""):
 
 
 # テンプレ文を生成
-def _same_category(p_category, c_category, p_ph, c_ph, th_title):
-    p_words = _extract_embed_word(phs=p_ph, category_words=p_category)
+def _same_category(p_category, c_category, p_ph, c_ph, th_title, f_tmp):
+    templates = _read_templates(fn=f_tmp)
+    select_templates = random.choice(templates["templates"])
 
+    p_words = _extract_embed_word(phs=p_ph, category_words=p_category)
     c_words = _extract_embed_word(phs=c_ph, category_words=c_category)
 
     category_words = list(set(p_words + c_words))
-    c = "、".join(category_words)
-    return random.choice(same_category_template).replace("<c>", c).replace("<title>", th_title)
+    c = "、".join(random.sample(category_words, 3))
+
+    rmsg = select_templates.replace("<c>", c).replace("<title>", th_title)
+
+    return random.choice(templates["cushions"]) + rmsg
 
 
 # カテゴリ・ドメインを持つ単語のみ抽出
@@ -94,7 +110,7 @@ def _extract_category_domain(phs):
 
 # 親投稿文と投稿文が同じカテゴリに属する単語を持っている場合はテンプレ文を返す
 # p_ph = 親投稿の形態素情報
-def same_category_q_generator(TFIDF_pp="", parent="", child="", th_title="", f_mrph=""):
+def same_category_q_generator(TFIDF_pp="", parent="", child="", th_title="", f_mrph="", f_tmp=""):
     p_phs = mynlp.read_mrph_per_post(f_path=f_mrph, pi=parent["pi"])
     c_phs = mynlp.read_mrph_per_post(f_path=f_mrph, pi=child["pi"])
 
@@ -114,7 +130,8 @@ def same_category_q_generator(TFIDF_pp="", parent="", child="", th_title="", f_m
     ca_n = _choicer_category_by_tfidf(p_category=p_category, c_category=c_category, \
                                       common_categorys=common_category, TFIDF_pp=TFIDF_pp, \
                                       parent=parent, child=child)
-    r_msg = _same_category(p_category[ca_n], c_category[ca_n], p_phs[parent["si"]], c_phs[child["si"]], th_title)
+    r_msg = _same_category(p_category[ca_n], c_category[ca_n], p_phs[parent["si"]], c_phs[child["si"]], \
+                           th_title, f_tmp)
     if not r_msg:
         print("   nazo no false")
     return r_msg
